@@ -118,6 +118,6 @@ app.get('/api/check-update/:messageId', async (req, res) => {
 });
 
 // Inicia el servidor y lo pone a escuchar en el puerto definido
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Servidor corriendo en 0.0.0.0:${PORT}`);
 });
